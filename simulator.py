@@ -23,5 +23,23 @@ class Simulator:
     def run(self, interval):
         while True:
             readings=self.generate_readings()
-            print (readings[0])
-            time.sleep(interval)
+            for reading in readings:
+                print(
+                    f"{reading.meter_id} |"
+                    f"Flow: {reading.flow_rate} L/S |"
+                    f"Consumption: {reading.total_consumption} L"
+                    f"timestamp: {reading.timestamp.isoformat()}"      
+                )
+
+            time.sleep(5)
+            
+
+
+    def set_meter_mode(self, meter_id, mode):
+        for meter in self.meters:
+            if meter.meter_id==meter_id:
+                meter.mode=mode
+                return
+
+        print(f"Meter {meter_id} not found!")
+

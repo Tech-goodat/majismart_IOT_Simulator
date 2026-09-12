@@ -23,7 +23,6 @@ class Meter:
         current_time=datetime.now(timezone.utc)
 
         elapsed_seconds=( current_time - self.last_reading_time).total_seconds()
-
         self.flow_rate=self.generate_flow_rate()
         consumption=self.flow_rate * elapsed_seconds
         self.total_consumption += consumption

@@ -1,32 +1,21 @@
 import time
+import json
 
 from meter import Meter
+from simulator import Simulator
+from mqtt_client import MQTTClient
 
 
-meter = Meter("MTR-00001")
+simulator=Simulator(20)
+mqtt_client=MQTTClient()
+mqtt_client.connect()
 
-for _ in range(5):
-    reading = meter.generate_reading()
-
-    print(
-        f"{reading.meter_id} | "
-        f"Flow: {reading.flow_rate} L/s | "
-        f"Consumption: {reading.total_consumption} L"
-    )
-
-    time.sleep(2)
-
-meter.mode = "LEAK"
-
-print("\n--- LEAK STARTED ---\n")
-
-for _ in range(5):
-    reading = meter.generate_reading()
-
-    print(
-        f"{reading.meter_id} | "
-        f"Flow: {reading.flow_rate} L/s | "
-        f"Consumption: {reading.total_consumption} L"
-    )
+while True:
+    readings=simulator.generate_readings()
+    for reading in readings:
+        topic=f"maji/meters/{reading.meter_id}/telemetry"
+        payload=json.dumps(reading.to_dict())
+        mqtt_client.publish(topic, payload)
+        print(f"Published : {topic}")
 
     time.sleep(2)
