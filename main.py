@@ -1,21 +1,30 @@
+import os
 import time
 import json
 
-from meter import Meter
+from dotenv import load_dotenv
+
 from simulator import Simulator
 from mqtt_client import MQTTClient
 
+load_dotenv()
 
-simulator=Simulator(20)
-mqtt_client=MQTTClient()
+meter_count = int(os.getenv("METER_COUNT", "20"))
+
+simulator = Simulator(meter_count)
+
+mqtt_client = MQTTClient()
 mqtt_client.connect()
 
 while True:
-    readings=simulator.generate_readings()
+    readings = simulator.generate_readings()
+
     for reading in readings:
-        topic=f"maji/meters/{reading.meter_id}/telemetry"
-        payload=json.dumps(reading.to_dict())
+        topic = f"maji/meters/{reading.meter_id}/telemetry"
+        payload = json.dumps(reading.to_dict())
+
         mqtt_client.publish(topic, payload)
-        print(f"Published : {topic}")
+
+        print(f"Published: {topic}")
 
     time.sleep(2)
