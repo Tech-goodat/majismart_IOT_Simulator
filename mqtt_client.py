@@ -1,10 +1,12 @@
-
 import os
+import time
 import paho.mqtt.client as mqtt
 
 
 class MQTTClient:
+
     def __init__(self):
+
         self.broker = os.getenv(
             "MQTT_BROKER_HOST",
             "localhost"
@@ -36,7 +38,15 @@ class MQTTClient:
         if self.use_tls:
             self.client.tls_set()
 
+        self.client.on_disconnect = self.on_disconnect
+
+    def on_disconnect(self, client, userdata, rc):
+        print(
+            f"MQTT disconnected. Return code: {rc}"
+        )
+
     def connect(self):
+
         self.client.connect(
             self.broker,
             self.port
@@ -49,11 +59,39 @@ class MQTTClient:
             f"{self.broker}:{self.port}"
         )
 
+    def reconnect(self):
+
+        while not self.client.is_connected():
+
+            try:
+                print("MQTT connection lost. Reconnecting...")
+
+                self.client.reconnect()
+
+                print("MQTT reconnected.")
+
+            except Exception as error:
+
+                print(
+                    f"Reconnect failed: {error}"
+                )
+
+                time.sleep(2)
+
     def publish(self, topic, payload):
+
+        self.reconnect()
+
         result = self.client.publish(
             topic,
             payload
         )
+
+        if result.rc != mqtt.MQTT_ERR_SUCCESS:
+            print(
+                f"Publish failed with code: {result.rc}"
+            )
+            return
 
         print(
             f"Publish queued: {result.rc}"
