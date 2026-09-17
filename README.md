@@ -181,23 +181,6 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Environment Variables
-
-Create a `.env` file:
-
-```env
-METER_COUNT=20
-
-MQTT_BROKER_HOST=your-hivemq-host
-MQTT_BROKER_PORT=8883
-
-MQTT_USERNAME=your-mqtt-username
-MQTT_PASSWORD=your-mqtt-password
-
-MQTT_USE_TLS=True
-```
-
-Never commit `.env` or MQTT credentials to the repository.
 
 ## Run the Simulator
 
