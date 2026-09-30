@@ -13,7 +13,7 @@ meter_count = int(os.getenv("METER_COUNT", "20"))
 
 simulator = Simulator(meter_count)
 
-mqtt_client = MQTTClient()
+mqtt_client = MQTTClient(simulator)
 mqtt_client.connect()
 
 while True:
