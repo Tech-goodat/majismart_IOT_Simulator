@@ -23,8 +23,13 @@ class MQTTClient:
             )
         )
 
-        self.username = os.getenv("MQTT_USERNAME")
-        self.password = os.getenv("MQTT_PASSWORD")
+        self.username = os.getenv(
+            "MQTT_USERNAME"
+        )
+
+        self.password = os.getenv(
+            "MQTT_PASSWORD"
+        )
 
         self.use_tls = os.getenv(
             "MQTT_USE_TLS",
@@ -34,37 +39,67 @@ class MQTTClient:
         self.client = mqtt.Client()
 
         if self.username and self.password:
+
             self.client.username_pw_set(
                 self.username,
                 self.password
             )
 
         if self.use_tls:
+
             self.client.tls_set()
 
-        self.client.on_disconnect = self.on_disconnect
-        self.client.on_message = self.on_message
-
-    def on_disconnect(self, client, userdata, rc):
-        print(
-            f"MQTT disconnected. Return code: {rc}"
+        self.client.on_disconnect = (
+            self.on_disconnect
         )
 
-    def on_message(self, client, userdata, msg):
+        self.client.on_message = (
+            self.on_message
+        )
+
+    def on_disconnect(
+        self,
+        client,
+        userdata,
+        rc
+    ):
+
+        print(
+            f"MQTT disconnected. "
+            f"Return code: {rc}"
+        )
+
+    def on_message(
+        self,
+        client,
+        userdata,
+        msg
+    ):
 
         try:
+
             payload = msg.payload.decode()
 
-            data = json.loads(payload)
+            data = json.loads(
+                payload
+            )
 
             meter_id = data["meter_id"]
-            valve_open = data["valve_open"]
-            closure_source = data["closure_source"]
+
+            valve_open = data[
+                "valve_open"
+            ]
+
+            closure_source = data[
+                "closure_source"
+            ]
 
             print(
-                f"Command received for {meter_id}: "
+                f"Command received for "
+                f"{meter_id}: "
                 f"valve_open={valve_open}, "
-                f"closure_source={closure_source}"
+                f"closure_source="
+                f"{closure_source}"
             )
 
             self.simulator.set_valve_state(
@@ -76,7 +111,8 @@ class MQTTClient:
         except Exception as error:
 
             print(
-                f"Failed to process MQTT command: {error}"
+                f"Failed to process MQTT "
+                f"command: {error}"
             )
 
     def connect(self):
@@ -98,7 +134,8 @@ class MQTTClient:
         )
 
         print(
-            "Subscribed to maji/meters/+/command"
+            "Subscribed to "
+            "maji/meters/+/command"
         )
 
     def reconnect(self):
@@ -108,7 +145,8 @@ class MQTTClient:
             try:
 
                 print(
-                    "MQTT connection lost. Reconnecting..."
+                    "MQTT connection lost. "
+                    "Reconnecting..."
                 )
 
                 self.client.reconnect()
@@ -120,12 +158,17 @@ class MQTTClient:
             except Exception as error:
 
                 print(
-                    f"Reconnect failed: {error}"
+                    f"Reconnect failed: "
+                    f"{error}"
                 )
 
                 time.sleep(2)
 
-    def publish(self, topic, payload):
+    def publish(
+        self,
+        topic,
+        payload
+    ):
 
         self.reconnect()
 
@@ -137,14 +180,11 @@ class MQTTClient:
         if result.rc != mqtt.MQTT_ERR_SUCCESS:
 
             print(
-                f"Publish failed with code: {result.rc}"
+                f"Publish failed with code: "
+                f"{result.rc}"
             )
 
             return
-
-        print(
-            f"Publish queued: {result.rc}"
-        )
 
         result.wait_for_publish()
 
